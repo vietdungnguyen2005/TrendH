@@ -1,0 +1,66 @@
+# Blacklist configuration for filtering spam, ads, and unwanted content
+
+# Common spam patterns
+spam_keywords:
+  - "click here"
+  - "limited time offer"
+  - "buy now"
+  - "free shipping"
+  - "50% off"
+  - "discount code"
+  - "promo code"
+  - "affiliate link"
+  - "use code"
+  - "dm me"
+  - "check my bio"
+  - "link in bio"
+
+# Advertising patterns
+advertising_keywords:
+  - "sponsored"
+  - "advertisement"
+  - "partnership"
+  - "collaboration"
+  - "giveaway"
+  - "follow for more"
+  - "subscribe"
+  - "like and share"
+
+# Political & news (often not product trends)
+political_keywords:
+  - "biden"
+  - "trump"
+  - "congress"
+  - "senate"
+  - "election"
+  - "vote"
+  - "democrat"
+  - "republican"
+  - "politician"
+
+# Generic/common terms to exclude (too broad)
+generic_terms:
+  - "thing"
+  - "stuff"
+  - "product"
+  - "item"
+  - "this"
+  - "that"
+  - "these"
+  - "those"
+  - "something"
+  - "anything"
+
+# Crypto/NFT spam (if not your niche)
+crypto_spam:
+  - "crypto giveaway"
+  - "free bitcoin"
+  - "nft drop"
+  - "whitelist"
+  - "presale"
+
+# Adult content (optional, depending on niche)
+adult_content:
+  - "nsfw"
+  - "18+"
+  - "adult only"

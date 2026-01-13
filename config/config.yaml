@@ -1,0 +1,184 @@
+# Trend Hunter Configuration File
+
+# Project settings
+project:
+  name: "TrendHunter"
+  version: "0.1.0"
+  environment: "development"  # development, production
+
+# Database settings
+database:
+  type: "sqlite"  # sqlite or postgresql
+  sqlite:
+    path: "data/trendhunter.db"
+  postgresql:  # For future scaling
+    host: "localhost"
+    port: 5432
+    database: "trendhunter"
+    user: "postgres"
+    password: ""  # Use .env file for secrets
+
+# Crawler settings
+crawler:
+  reddit:
+    enabled: true
+    client_id: ""  # Set via .env or secrets.yaml
+    client_secret: ""  # Set via .env or secrets.yaml
+    user_agent: "TrendHunter/0.1"
+    subreddits:
+      - "ProductPorn"
+      - "shutupandtakemymoney"
+      - "DidntKnowIWantedThat"
+      - "ineeeedit"
+      - "coolguides"
+    fetch_limit: 100  # Posts per subreddit per run
+    time_filter: "day"  # hour, day, week, month
+    
+  tiktok:
+    enabled: true
+    creative_center_url: "https://ads.tiktok.com/business/creativecenter/inspiration/popular/hashtag/pc/en"
+    hashtags_to_track: 50  # Number of trending hashtags to track
+    use_playwright: true
+    headless: true
+    
+  schedule:
+    interval_hours: 1  # Run crawler every N hours
+    retry_attempts: 3
+    retry_delay_seconds: 60
+
+# Processing settings
+processing:
+  filtering:
+    blacklist_file: "config/blacklist.yaml"
+    spam_threshold: 0.7
+    min_post_length: 10
+    max_post_length: 5000
+    
+  entity_extraction:
+    min_ngram: 1
+    max_ngram: 4
+    min_frequency: 2
+    use_spacy: true
+    spacy_model: "en_core_web_sm"
+    
+  normalization:
+    lowercase: true
+    remove_special_chars: true
+    apply_stemming: false  # Can cause over-grouping
+    min_term_length: 3
+
+# Google Trends verification
+pytrends:
+  enabled: true
+  replicate_samples: 3  # Number of times to replicate each query
+  batch_size: 5  # Terms per request (Google limit)
+  cache_ttl_hours: 24
+  rate_limit:
+    requests_per_minute: 10
+    delay_between_requests: 6  # seconds
+  retry:
+    max_attempts: 3
+    backoff_factor: 2
+  geo: ""  # Empty for worldwide, or "US", "VN", etc.
+  timeframe: "now 7-d"  # Last 7 days
+  
+# Feature engineering
+features:
+  slope:
+    window_days: 7
+  acceleration:
+    window_days: 7
+  moving_averages:
+    - 3
+    - 7
+  pct_change:
+    hours: 24
+  novelty:
+    decay_days: 30
+
+# Scoring settings
+scoring:
+  weights:
+    slope: 0.25
+    acceleration: 0.20
+    ma_trend: 0.15
+    pct_change_24h: 0.15
+    platform_count: 0.10
+    novelty_score: 0.10
+    influencer_weighted: 0.05
+  
+  thresholds:
+    hidden_gem: 40  # Score 40-60
+    breakout: 60    # Score 60-80
+    strong: 80      # Score 80+
+    
+  alert_threshold: 70  # Only alert if score >= 70
+  
+# Backtest settings
+backtest:
+  rolling_window:
+    train_days: 14
+    test_days: 7
+  metrics:
+    - "precision@50"
+    - "precision@100"
+    - "recall@7d"
+    - "lead_time_median"
+    - "fpr"
+  ground_truth:
+    iot_increase_pct: 100  # 100% increase
+    iot_absolute_min: 20   # Minimum absolute IOT value
+    top_n_posts: 10        # Top N posts in platform
+
+# UI settings
+ui:
+  streamlit:
+    title: "Trend Hunter Dashboard"
+    port: 8501
+    theme: "dark"
+  
+  dashboard:
+    top_flags_display: 50
+    refresh_interval_seconds: 300  # 5 minutes
+    enable_export: true
+
+# Alerts settings
+alerts:
+  telegram:
+    enabled: false  # Set to true when configured
+    bot_token: ""  # Set via .env
+    chat_id: ""    # Set via .env
+    
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender_email: ""  # Set via .env
+    sender_password: ""  # Set via .env
+    recipient_emails: []
+    
+  alert_cooldown_hours: 6  # Don't re-alert same term within N hours
+
+# Logging settings
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"  # json or text
+  rotation: "1 day"
+  retention: "30 days"
+  log_file: "logs/trendhunter.log"
+
+# Backup settings
+backup:
+  enabled: true
+  database:
+    daily: true
+    weekly: true
+    backup_dir: "data/backups"
+    retention_days: 30
+
+# IP rotation (for avoiding rate limits)
+ip_rotation:
+  enabled: false
+  method: "dcom"  # dcom or proxy
+  reset_script: "utils/ip_reset.py"
+  auto_trigger_on_429: true
