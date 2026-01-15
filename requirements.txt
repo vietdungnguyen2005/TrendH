@@ -10,6 +10,7 @@ selenium==4.16.0                 # Backup browser automation
 
 # Google Trends
 pytrends==4.9.2                  # Google Trends API
+urllib3<2                        # Compatibility fix for pytrends
 
 # Data processing
 pandas==2.1.4                    # Data manipulation
